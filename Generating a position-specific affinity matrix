@@ -1,0 +1,60 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Load the data from the text file
+file_path = '/mnt/data/your_uploaded_file.txt'
+
+# Read the file
+with open(file_path, 'r') as file:
+    lines = file.readlines()
+
+# Process the lines to extract sequences and activities
+sequences = []
+activities = []
+for line in lines:
+    parts = line.split()
+    sequences.append(parts[0])
+    activities.append(float(parts[1]))
+
+df = pd.DataFrame({'Sequence': sequences, 'Activity': activities})
+
+# Ensure all sequences are the same length
+sequence_length = len(df['Sequence'][0])
+for seq in df['Sequence']:
+    assert len(seq) == sequence_length, "All sequences must be of the same length"
+
+# One-hot encode the sequences
+def one_hot_encode(sequences):
+    encoding = {'A': 0, 'C': 1, 'G': 2, 'T': 3}
+    encoded_sequences = np.zeros((len(sequences), sequence_length, 4))
+    for i, sequence in enumerate(sequences):
+        for j, nucleotide in enumerate(sequence):
+            encoded_sequences[i, j, encoding[nucleotide]] = 1
+    return encoded_sequences
+
+encoded_sequences = one_hot_encode(df['Sequence'])
+
+# Construct the position-specific affinity matrix
+affinity_matrix = np.zeros((sequence_length, 4))
+
+for i in range(sequence_length):
+    for j in range(4):
+        affinity_matrix[i, j] = np.sum(encoded_sequences[:, i, j] * df['Activity'])
+
+# Normalize the matrix
+affinity_matrix /= np.sum(df['Activity'])
+
+# Convert affinity matrix to DataFrame for better readability
+affinity_matrix_df = pd.DataFrame(affinity_matrix, columns=['A', 'C', 'G', 'T'])
+affinity_matrix_df.index = [f'Position {i+1}' for i in range(sequence_length)]
+
+# Display the affinity matrix
+print(affinity_matrix_df)
+
+# Visualize the affinity matrix
+plt.figure(figsize=(12, 8))
+sns.heatmap(affinity_matrix_df, annot=True, cmap="viridis")
+plt.title('Position-Specific Affinity Matrix')
+plt.show()
