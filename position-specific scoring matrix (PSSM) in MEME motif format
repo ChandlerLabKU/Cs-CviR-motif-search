@@ -1,0 +1,49 @@
+# Define the entropy-weighted affinity matrix
+weighted_affinity_matrix = np.array([
+    [0.009778, 0.368155, 0.005878, 0.005604],
+    [0.001809, 0.211377, 0.001447, 0.002484],
+    [0.002766, 0.003660, 0.001811, 0.246868],
+    [0.001612, 0.001063, 0.173786, 0.000999],
+    [0.450659, 0.009443, 0.011675, 0.013779],
+    [0.001403, 0.287439, 0.003509, 0.007309],
+    [0.007523, 0.337385, 0.002881, 0.006984],
+    [0.011194, 0.444991, 0.010319, 0.012178],
+    [0.009395, 0.005075, 0.005288, 0.356873],
+    [0.008387, 0.007574, 0.004881, 0.365602],
+    [0.011374, 0.013465, 0.459096, 0.011636],
+    [0.003162, 0.001811, 0.294560, 0.007967],
+    [0.521363, 0.010894, 0.023790, 0.016880],
+    [0.443286, 0.011443, 0.011301, 0.010604],
+    [0.001176, 0.211602, 0.001792, 0.002834],
+    [0.276111, 0.002555, 0.004062, 0.004033],
+    [0.002279, 0.002042, 0.217461, 0.001776],
+    [0.007411, 0.009016, 0.009461, 0.400298],
+    [0.458477, 0.012112, 0.010296, 0.014001]
+])
+
+# Create the PSSM file content
+pssm_content = """MEME version 4
+
+ALPHABET= ACGT
+
+strands: + -
+
+Background letter frequencies (from uniform background):
+A 0.175 C 0.325 G 0.325 T 0.175
+
+MOTIF EntropyWeightedMotif
+letter-probability matrix: alength= 4 w= 19 nsites= 1 E= 0
+"""
+
+# Append the weighted affinity values to the PSSM content
+for row in weighted_affinity_matrix:
+    pssm_content += " ".join(map(str, row)) + "\n"
+
+# Save the PSSM content to a file
+pssm_file_path = '/mnt/data/entropy_weighted_pssm.txt'
+with open(pssm_file_path, 'w') as f:
+    f.write(pssm_content)
+
+pssm_file_path
+
+
